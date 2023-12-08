@@ -14,6 +14,8 @@ namespace Innovate
 {
     public class AttendeeFunctions
     {
+        private const AuthorizationLevel AccessLevel = AuthorizationLevel.Anonymous;
+        
         private readonly AttendeeDataTables attendeeDataTables;
 
         private static JsonSerializerSettings _serializerSettings = new JsonSerializerSettings()
@@ -38,7 +40,7 @@ namespace Innovate
 
         [FunctionName("postTeam")]
         public async Task<IActionResult> PostTeam(
-            [HttpTrigger(AuthorizationLevel.Admin, "post", Route = "teams")]
+            [HttpTrigger(AccessLevel, "post", Route = "teams")]
             HttpRequest req,
             ILogger log,
             [SignalR(HubName = "serverless")] IAsyncCollector<SignalRMessage> signalRMessages)
@@ -73,7 +75,7 @@ namespace Innovate
 
         [FunctionName("postAttendee")]
         public async Task<IActionResult> PostAttendee(
-            [HttpTrigger(AuthorizationLevel.Admin, "post", Route = "teams/{teamId}/attendees")]
+            [HttpTrigger(AccessLevel, "post", Route = "teams/{teamId}/attendees")]
             HttpRequest req,
             string teamId,
             ILogger log,
@@ -100,7 +102,7 @@ namespace Innovate
 
         [FunctionName("deleteAttendee")]
         public async Task<IActionResult> DeleteAttendee(
-            [HttpTrigger(AuthorizationLevel.Admin, "delete", Route = "teams/{teamId}/attendees/{attendeeId}")]
+            [HttpTrigger(AccessLevel, "delete", Route = "teams/{teamId}/attendees/{attendeeId}")]
             HttpRequest req,
             string teamId,
             string attendeeId,
@@ -120,7 +122,7 @@ namespace Innovate
 
         [FunctionName("resetSignIns")]
         public async Task<IActionResult> ResetAttendance(
-            [HttpTrigger(AuthorizationLevel.Admin, "delete", Route = "attendees")]
+            [HttpTrigger(AccessLevel, "delete", Route = "attendees")]
             HttpRequest req,
             [SignalR(HubName = "serverless")] IAsyncCollector<SignalRMessage> signalRMessages)
         {
