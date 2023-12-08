@@ -1,0 +1,1 @@
+export type ConsentState = "yes" | "no" | "remote";

@@ -1,0 +1,15 @@
+.photo-consent-modal {
+    .qr-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        border-radius: 30px;
+        padding: 15px;
+        border: 1px solid #ccc;
+        margin-bottom: 20px;
+    }
+
+    .form-body {
+        padding-inline: 10px;
+    }
+}

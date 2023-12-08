@@ -1,0 +1,133 @@
+.welcome {
+    width: 100dvw;
+    height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .attendee {
+        max-width: 1vw;
+        gap: 30px;
+        display: flex;
+        align-items: center;
+        font-weight: bold;
+        color: white;
+        animation: typing 3.5s steps(40, end);
+
+        > img {
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+        }
+
+        .name {
+            font-size: 150px;
+        }
+
+        .title {
+            font-size: 50px;
+        }
+    }
+
+    #confettis {
+        overflow: hidden;
+        position: absolute;
+        height: 100%;
+        width: 100%;
+    }
+
+    .confetti {
+        width: 16px;
+        height: 16px;
+        position: absolute;
+        animation: confetti 5s ease-in-out infinite;
+    }
+
+
+    .confetti:nth-child(1) {
+        left: 5%;
+        animation-delay: 0s;
+        background-color: #fc0120;
+    }
+
+    .confetti:nth-child(2) {
+        left: 15%;
+        animation-delay: 5s;
+        background-color: #8257e6;
+    }
+
+    .confetti:nth-child(3) {
+        left: 25%;
+        animation-delay: -3s;
+        background-color: #ffbf4d;
+    }
+
+    .confetti:nth-child(4) {
+        left: 35%;
+        animation-delay: -2.5s;
+        background-color: #fe5d7a;
+    }
+
+    .confetti:nth-child(5) {
+        left: 45%;
+        animation-delay: -4s;
+        background-color: #45ec9c;
+    }
+
+    .confetti:nth-child(6) {
+        left: 55%;
+        animation-delay: -6s;
+        background-color: #f6e327;
+    }
+
+    .confetti:nth-child(7) {
+        left: 65%;
+        animation-delay: -1.5s;
+        background-color: #f769ce;
+    }
+
+    .confetti:nth-child(8) {
+        left: 75%;
+        animation-delay: -2s;
+        background-color: #007de7;
+    }
+
+    .confetti:nth-child(9) {
+        left: 85%;
+        animation-delay: -3.5s;
+        background-color: #63b4fc;
+    }
+
+    .confetti:nth-child(10) {
+        left: 95%;
+        animation-delay: -2.5s;
+        background-color: #f9c4ea;
+    }
+}
+
+@keyframes typing {
+    from {
+        width: 0;
+    }
+    to {
+        width: 100%;
+    }
+}
+
+@keyframes confetti {
+    0% {
+        transform: rotateZ(15deg) rotateY(0deg) translate(0px, 0px);
+    }
+    25% {
+        transform: rotateZ(5deg) rotateY(360deg) translate(-5vw, 20vh);
+    }
+    50% {
+        transform: rotateZ(15deg) rotateY(720deg) translate(5vw, 60vh);
+    }
+    75% {
+        transform: rotateZ(5deg) rotateY(1080deg) translate(-10vw, 80vh);
+    }
+    100% {
+        transform: rotateZ(15deg) rotateY(1440deg) translate(10vw, 110vh);
+    }
+}

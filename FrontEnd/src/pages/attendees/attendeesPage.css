@@ -1,0 +1,12 @@
+.attendees-page {
+    margin-top: 75px;
+    .navbar {
+        background-color: #aa30df;
+        color: white;
+        box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.6);
+    }
+
+    .navbar-brand {
+        font-size: 38px;
+    }
+}

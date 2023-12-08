@@ -1,0 +1,11 @@
+.innovate-font {
+    font-family: innovate, sans-serif;
+    text-transform: uppercase;
+    color: white;
+    letter-spacing: 0.3rem;
+    line-height: 3.2rem;
+    text-shadow:
+            0 0 5px #fff,
+            0 0 10px #fff,
+            0 0 20px #fd08ee
+}

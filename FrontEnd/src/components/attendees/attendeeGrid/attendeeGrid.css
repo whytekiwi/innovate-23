@@ -1,0 +1,11 @@
+.attendee-grid {
+    display: flex;
+    gap: 10px;
+    padding-inline: 10px;
+    padding-block: 5px;
+    overflow-y: scroll;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
