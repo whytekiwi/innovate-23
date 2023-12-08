@@ -1,14 +1,15 @@
 import {AttendeeEntity} from "../models/attendeeEntity";
 import {TeamEntity} from "../models/teamEntity";
+import {ConsentState} from "../models/consentState";
 
 const url = "http://localhost:7071/api/";
 const attendeesPath = "attendees";
 const teamsPath = "teams";
 
 export default class AttendeeService {
-  public static async selectAttendee(teamId?: string, attendeeId?: string, givesPhotoConsent?: boolean) {
+  public static async selectAttendee(teamId?: string, attendeeId?: string, consentState?: ConsentState) {
     await this.post(url + teamsPath + "/" + teamId + "/" + attendeesPath + "/" + attendeeId, JSON.stringify({
-      photoConsent: givesPhotoConsent
+      photoConsent: consentState
     }));
   }
 

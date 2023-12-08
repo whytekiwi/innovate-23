@@ -15,17 +15,13 @@ export interface IAttendeeListItemProps {
 const AttendeeListItem: React.FC<IAttendeeListItemProps> = (props) => {
   const {attendee, isEdit, onAttendeeEdit} = props;
 
-  // const handleAttendeeClicked = async () => {
-  //   if (!isEdit)
-  //     handleOpenModal();
-  // }
-
   const handleAttendeeClicked = async () => {
-    await AttendeeService.selectAttendee(attendee.teamId, attendee.id, true);
+    if (!isEdit)
+      handleOpenModal();
   }
 
-  const handlePhotoConsent = async (givesConsent?: ConsentState) => {
-    await AttendeeService.selectAttendee(attendee.teamId, attendee.id, true);
+  const handlePhotoConsent = async (consentState?: ConsentState) => {
+    await AttendeeService.selectAttendee(attendee.teamId, attendee.id, consentState);
     handleCloseModal();
   }
 

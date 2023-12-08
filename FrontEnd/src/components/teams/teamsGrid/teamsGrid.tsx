@@ -31,7 +31,7 @@ const TeamsGrid: React.FC<ITeamsGridProps> = (props) => {
   useEffect(() => {
     loadTeams();
     onAttendeeUpdated(() => loadTeams());
-  }, []);
+  }, [onAttendeeUpdated]);
 
   const handleOpenDialog = () => {
     setIsDialogOpen(true);
@@ -50,9 +50,9 @@ const TeamsGrid: React.FC<ITeamsGridProps> = (props) => {
     <div className={"team-grid"}>
       {isLoading && <div>Loading...</div>}
       {teams && teams
-          .map((team) => (
-        <TeamListItem team={team} isEdit={isEdit} key={team.id} onEditTeam={handleEditTeam} searchText={searchText}/>
-      ))}
+        .map((team) => (
+          <TeamListItem team={team} isEdit={isEdit} key={team.id} onEditTeam={handleEditTeam} searchText={searchText}/>
+        ))}
       {isEdit && (
         <>
           <Button onClick={handleOpenDialog}>Add new team</Button>

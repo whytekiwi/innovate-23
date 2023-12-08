@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from 'react';
+import React, {useState} from 'react';
 import TeamsGrid from "../../components/teams/teamsGrid/teamsGrid";
 import {Input, InputGroup, InputGroupText, Navbar, NavbarBrand} from "reactstrap";
 import InnovateFont from "../../components/shared/innovateFont/innovateFont";

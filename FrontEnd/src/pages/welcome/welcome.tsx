@@ -20,17 +20,17 @@ function Welcome() {
     };
   }
 
-  const handleAttendeeSelected = (attendee?: AttendeeEntity) => {
-    setAttendee(attendee);
-
-    // debounce(() => {
-    //   setAttendee(undefined);
-    // }, 30000)();
-  }
-
   useEffect(() => {
+    const handleAttendeeSelected = (attendee?: AttendeeEntity) => {
+      setAttendee(attendee);
+
+      debounce(() => {
+        setAttendee(undefined);
+      }, 30000)();
+    }
+
     onAttendeeSelected((attendee) => handleAttendeeSelected(attendee))
-  }, []);
+  }, [onAttendeeSelected]);
 
   return (
     <div className="welcome">
