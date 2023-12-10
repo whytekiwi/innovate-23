@@ -5,6 +5,8 @@ import AttendeeService from "../../../services/attendeeService";
 import {Button} from "reactstrap";
 import PhotoConsentModal from "../photoConsentModal/photoConsentModal";
 import {ConsentState} from "../../../models/consentState";
+import Tick from "../../shared/icons/tick";
+import Remote from "../../shared/icons/remote";
 
 export interface IAttendeeListItemProps {
   attendee: AttendeeEntity;
@@ -49,15 +51,30 @@ const AttendeeListItem: React.FC<IAttendeeListItemProps> = (props) => {
     return classes.join(" ");
   }
 
+  const renderState = () => {
+    switch (attendee.photoConsent) {
+      case "yes":
+      case "no":
+        return <Tick/>;
+      case "remote":
+        return <Remote/>;
+    }
+  }
+
   return (
     <div className={className()} onClick={handleAttendeeClicked}>
       {attendee.profilePictureUrl.value &&
           <img className="profile" src={attendee.profilePictureUrl.value} alt="Profile"/>}
-      <div>
-        <div>{attendee.name.value}</div>
-        <div>{attendee.jobTitle.value}</div>
-        {isEdit && <Button onClick={handleAttendeeEdit}>Edit</Button>}
+      <div className="attendee-details">
+        <div>
+          <div className="name">{attendee.name.value}</div>
+          <div className="job-title">{attendee.jobTitle.value}</div>
+        </div>
+        <div className="status">
+          {attendee.hasSignedInToday && renderState()}
+        </div>
       </div>
+      {isEdit && <Button onClick={handleAttendeeEdit}>Edit</Button>}
       <PhotoConsentModal toggle={handleCloseModal} isOpen={isModalOpen} onConsent={handlePhotoConsent}/>
     </div>
   );

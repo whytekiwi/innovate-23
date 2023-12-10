@@ -1,0 +1,16 @@
+svg {
+    width: 24px;
+    height: 24px;
+
+    > path {
+        fill: currentColor;
+    }
+
+    &.tick {
+        color: #2bc27f;
+    }
+
+    &.remote {
+        color: #b555ef;
+    }
+}
