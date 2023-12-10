@@ -48,30 +48,30 @@ const PhotoConsentModal: React.FC<IPhotoConsentModalProps> = (props) => {
 
         <Form className="form-body">
           <FormGroup>
-            <Label>
-              <Input type={"radio"} name="consent" checked={hasConsent === "yes"}
-                     onChange={() => handleConsentState("yes")}/>{" "}
-              Yes I consent to my photo being used.
+            <Input type={"radio"} id="yes" name="consent" checked={hasConsent === "yes"}
+                   onChange={() => handleConsentState("yes")}/>
+            <Label for="yes">
+              Yes, I consent to my photo being used.
             </Label>
           </FormGroup>
           <FormGroup>
-            <Label>
-              <Input type={"radio"} name="consent" checked={hasConsent === "no"}
-                     onChange={() => handleConsentState("no")}/>{" "}
+            <Input type={"radio"} id="no" name="consent" checked={hasConsent === "no"}
+                   onChange={() => handleConsentState("no")}/>
+            <Label for="no">
               No, please avoid taking my photo.
             </Label>
           </FormGroup>
           <FormGroup>
-            <Label>
-              <Input type={"radio"} name="consent" checked={hasConsent === "remote"}
-                     onChange={() => handleConsentState("remote")}/>{" "}
+            <Input type={"radio"} name="consent" id="remote" checked={hasConsent === "remote"}
+                   onChange={() => handleConsentState("remote")}/>
+            <Label for="remote">
               I will be remote for Innovate.
             </Label>
           </FormGroup>
         </Form>
 
-        {hasConsent !== "yes" && (
-          <Fade in={hasConsent === "no"}>
+        {hasConsent === "no" && (
+          <Fade in={true}>
             <Alert color="danger">
               Please take a red lanyard from the registration desk, to let the photographers know to avoid taking your
               photo.<br/><br/>
