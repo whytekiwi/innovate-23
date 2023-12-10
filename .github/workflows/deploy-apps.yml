@@ -54,3 +54,6 @@ jobs:
           action: "upload"
           app_location: "/FrontEnd"
           output_location: "build"
+        env:
+          REACT_APP_API_URL: ${{ secrets.FUNCTION_APP_BASE_URL }}
+        
