@@ -115,12 +115,6 @@ namespace Innovate
                     Target = "attendeeUpdated"
                 });
 
-            if (_maskAttendees)
-            {
-                Random r = new Random();
-                attendee = MapAttendee(attendee, r);
-            }
-
             return new OkObjectResult(attendee);
         }
 
@@ -193,6 +187,11 @@ namespace Innovate
                 await _attendeeDataTables.SignInAttendeeAsync(teamId, attendeeId, signInReceipt?.PhotoConsent);
 
             if (attendee == null) return new BadRequestObjectResult("Attendee does not exist");
+
+            if (_maskAttendees)
+            {
+                attendee = MapAttendee(attendee, new Random());
+            }
 
             var json = JsonConvert.SerializeObject(attendee, SerializerSettings);
 
