@@ -5,7 +5,7 @@ on:
     branches: ["main"]
 
 jobs:
-  build-and-deploy-function-app:
+  function-app:
     
     env:
       AZURE_FUNCTIONAPP_NAME: 'fa-innovate-23'
@@ -37,3 +37,20 @@ jobs:
         app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
         package: '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output'
         publish-profile: ${{ secrets.FUNCTION_APP_PUBLISH_PROFILE }}
+
+  web-app:
+
+    runs-on: ubuntu-latest
+    needs: [function-app]
+    
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build And Deploy
+        id: builddeploy
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.WEB_APP_DEPLOYMENT_TOKEN }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: "upload"
+          app_location: "/FrontEnd"
+          output_location: "build"
