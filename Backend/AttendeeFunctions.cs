@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using FunctionApp.Models;
 using Innovate.Data;
 using Innovate.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -142,6 +143,24 @@ namespace Innovate
                 });
 
             return new OkResult();
+        }
+
+        [FunctionName("countAttendees")]
+        public async Task<IActionResult> CountAttendees(
+            [HttpTrigger(AccessLevel, "get", Route = "attendees/count")]
+            HttpRequest req,
+            ILogger log)
+        {
+            var total = await _attendeeDataTables.CountAttendeesAsync();
+            var signedIn = await _attendeeDataTables.CountSignedInAttendeesAsync();
+            var remote = await _attendeeDataTables.CountSignedInRemoteAttendeesAsync();
+
+            return new OkObjectResult(new AttendeeCounts
+            {
+                Total = total,
+                SignedIn = signedIn,
+                RemoteSignedIn = remote
+            });
         }
 
         [FunctionName("resetSignIns")]

@@ -57,6 +57,28 @@ public class AttendeeDataTables
             .ToListAsync();
     }
 
+    public async Task<int> CountAttendeesAsync()
+    {
+        DateTimeOffset thisMorning = DateTimeOffset.Now.Date.ToUniversalTime();
+        return await _attendeesTable.QueryAsync<AttendeeEntity>()
+            .CountAsync();
+    }
+
+    public async Task<int> CountSignedInAttendeesAsync()
+    {
+        DateTimeOffset thisMorning = DateTimeOffset.Now.Date.ToUniversalTime();
+        return await _attendeesTable.QueryAsync<AttendeeEntity>(at => at.LastCheckInDate >= thisMorning)
+            .CountAsync();
+    }
+
+    public async Task<int> CountSignedInRemoteAttendeesAsync()
+    {
+        DateTimeOffset thisMorning = DateTimeOffset.Now.Date.ToUniversalTime();
+        return await _attendeesTable
+            .QueryAsync<AttendeeEntity>(at => at.LastCheckInDate >= thisMorning && at.PhotoConsent == "remote")
+            .CountAsync();
+    }
+
     public async Task ResetAttendanceAsync()
     {
         var attendees = _attendeesTable.Query<AttendeeEntity>();
@@ -78,7 +100,7 @@ public class AttendeeDataTables
 
         attendee.PhotoConsent = ConsentStateResolver.GetResolvedState(attendee.PhotoConsent, givesPhotoConsent);
         attendee.LastCheckInDate = DateTimeOffset.UtcNow;
-        
+
         await UpsetAttendeeAsync(attendee);
 
         var receipt = new SignInReceipt

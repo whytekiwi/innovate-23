@@ -1,6 +1,7 @@
 import {AttendeeEntity} from "../models/attendeeEntity";
 import {TeamEntity} from "../models/teamEntity";
 import {ConsentState} from "../models/consentState";
+import {AttendeeCounts} from "../models/attendeeCounts";
 
 const url = process.env.REACT_APP_API_URL || "http://localhost:7071/api/";
 const attendeesPath = "attendees";
@@ -17,6 +18,11 @@ export default class AttendeeService {
     await fetch(url + teamsPath + "/" + attendee.teamId + "/" + attendeesPath + "/" + attendee.id, {
       method: "DELETE"
     });
+  }
+
+  public static async getAttendeeCounts(): Promise<AttendeeCounts> {
+    let data = await this.get(url + attendeesPath + "/" + "count");
+    return data as AttendeeCounts;
   }
 
   public static async getTeams(): Promise<TeamEntity[]> {

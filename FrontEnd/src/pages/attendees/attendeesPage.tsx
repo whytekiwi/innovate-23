@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import TeamsGrid from "../../components/teams/teamsGrid/teamsGrid";
 import {Input, InputGroup, InputGroupText, Navbar, NavbarBrand} from "reactstrap";
 import './attendeesPage.css';
+import AttendeeCountDisplay from "../../components/attendees/attendeeCountDisplay/attendeeCountDisplay";
 
 function AttendeesPage() {
 
@@ -22,7 +23,8 @@ function AttendeesPage() {
             23
           </span>
         </NavbarBrand>
-        <div className="col-sm-5">
+        <div className="col-sm-5 right">
+          <AttendeeCountDisplay/>
           <InputGroup>
             <Input value={searchText} onChange={onSearchTextChanged}/>
             <InputGroupText>Search</InputGroupText>
