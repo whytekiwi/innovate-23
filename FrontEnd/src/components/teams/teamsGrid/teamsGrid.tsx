@@ -47,7 +47,7 @@ const TeamsGrid: React.FC<ITeamsGridProps> = (props) => {
   }
 
   return (
-    <div className={"team-grid"}>
+    <div className="team-grid">
       {isLoading && <div>Loading...</div>}
       {teams && teams
         .map((team) => (

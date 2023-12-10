@@ -21,7 +21,7 @@ const TeamListItem: React.FC<ITeamListItemProps> = (props) => {
 
   return (
     <div className="team-list">
-      <div>
+      <div className="team-info">
         <InnovateFont className="name">{team.name.value}</InnovateFont>
         <div className="problem">
           {team.problemStatement.value}

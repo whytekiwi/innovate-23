@@ -3,9 +3,9 @@
     gap: 10px;
     padding: 10px;
 
-    & > div:first-child {
+    .team-info {
         margin: 5px;
-        width: 300px;
+        width: 280px;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -14,11 +14,11 @@
     }
 
     .name {
-        font-size: 100px;
+        font-size: 50px;
     }
 
     .problem {
-        font-size: 32px;
+        font-size: 24px;
         color: white;
     }
 }

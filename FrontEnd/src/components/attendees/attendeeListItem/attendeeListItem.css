@@ -3,11 +3,12 @@
     display: flex;
     flex-direction: column;
     background: white;
-    width: 150px;
+    width: 180px;
     border-radius: 5px;
     box-shadow: 3px 3px 4px rgb(0, 0, 0, 0.5);
     filter: grayscale(1);
     overflow: hidden;
+    text-align: center;
 
     .profile {
         width: 100%;
@@ -33,10 +34,6 @@
 
     .name {
         font-weight: bold;
-    }
-
-    &.signed-in {
-        background: #45ec9c;
     }
 
 }

@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
 import TeamsGrid from "../../components/teams/teamsGrid/teamsGrid";
 import {Input, InputGroup, InputGroupText, Navbar, NavbarBrand} from "reactstrap";
-import InnovateFont from "../../components/shared/innovateFont/innovateFont";
 import './attendeesPage.css';
 
 function AttendeesPage() {
@@ -15,7 +14,14 @@ function AttendeesPage() {
   return (
     <div className="attendees-page">
       <Navbar fixed="top" dark={true}>
-        <NavbarBrand><InnovateFont>Innovate</InnovateFont></NavbarBrand>
+        <NavbarBrand>
+          <span className="innovate">
+            Innovate
+          </span>
+          <span className="year">
+            23
+          </span>
+        </NavbarBrand>
         <div className="col-sm-5">
           <InputGroup>
             <Input value={searchText} onChange={onSearchTextChanged}/>

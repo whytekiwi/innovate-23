@@ -4,6 +4,7 @@
     padding-inline: 10px;
     padding-block: 5px;
     overflow-y: scroll;
+    flex: 1 1 0;
 
     &::-webkit-scrollbar {
         display: none;

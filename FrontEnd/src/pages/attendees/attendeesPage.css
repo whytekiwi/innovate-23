@@ -1,12 +1,29 @@
 .attendees-page {
     margin-top: 75px;
+
     .navbar {
-        background-color: #aa30df;
+        background-color: #593ded;
         color: white;
-        box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.6);
+        box-shadow: 0 4px 4px rgba(0, 0, 0, 0.6);
     }
 
     .navbar-brand {
         font-size: 38px;
+
+        .innovate {
+            font-family: innovate, sans-serif;
+            text-shadow: 0 0 5px #fff,
+            0 0 10px #fff,
+            0 0 20px #fd08ee;
+            text-transform: uppercase;
+        }
+
+        .year {
+            font-family: magz, sans-serif;
+            color: #38b5fe;
+            margin-left: 3px;
+            text-shadow: 2px 0 0 #d641fa
+        }
     }
+
 }
