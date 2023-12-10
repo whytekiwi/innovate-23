@@ -1,32 +1,51 @@
 .welcome {
-    width: 100dvw;
-    height: 100dvh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
     .attendee {
-        max-width: 1vw;
-        gap: 30px;
+        width: 100dvw;
+        height: 100dvh;
         display: flex;
+        gap: 30px;
         align-items: center;
-        font-weight: bold;
-        color: white;
-        animation: typing 3.5s steps(40, end);
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 800ms linear;
+
+        &.show {
+            opacity: 1;
+        }
+
 
         > img {
-            width: 400px;
-            height: 400px;
+            width: 300px;
+            height: 300px;
             border-radius: 50%;
         }
 
-        .name {
-            font-size: 150px;
-        }
+        .details {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-weight: bold;
+            color: white;
 
-        .title {
-            font-size: 50px;
+            .name {
+                padding: 2rem;
+                overflow: hidden;
+                white-space: nowrap;
+                animation: typing 1s steps(40, end), border 1s;
+                font-size: 130px;
+            }
+
+            .title {
+                font-size: 50px;
+            }
         }
+    }
+
+    #decorations {
+        overflow: hidden;
+        position: absolute;
+        height: 100%;
+        width: 100%;
     }
 
     #confettis {
@@ -111,6 +130,18 @@
     }
     to {
         width: 100%;
+    }
+}
+
+@keyframes border {
+    0% {
+        border-inline: 3px solid white;
+    }
+    90% {
+        border-inline: 3px solid white;
+    }
+    100% {
+        border-inline: 0;
     }
 }
 
