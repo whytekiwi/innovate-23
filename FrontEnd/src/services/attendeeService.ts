@@ -2,7 +2,7 @@ import {AttendeeEntity} from "../models/attendeeEntity";
 import {TeamEntity} from "../models/teamEntity";
 import {ConsentState} from "../models/consentState";
 
-const url = "http://localhost:7071/api/";
+const url = process.env.REACT_APP_API_URL || "http://localhost:7071/api/";
 const attendeesPath = "attendees";
 const teamsPath = "teams";
 

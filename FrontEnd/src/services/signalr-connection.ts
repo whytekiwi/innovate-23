@@ -1,7 +1,7 @@
 import * as signalR from "@microsoft/signalr";
 import {AttendeeEntity} from "../models/attendeeEntity";
 
-const url = "http://localhost:7071/api/";
+const url = process.env.REACT_APP_API_URL || "http://localhost:7071/api/";
 
 class Connector {
   private connection: signalR.HubConnection;
