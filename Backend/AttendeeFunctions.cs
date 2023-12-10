@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Innovate.Data;
 using Innovate.Models;
@@ -7,6 +9,7 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.WebJobs.Extensions.SignalRService;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -15,18 +18,27 @@ namespace Innovate
     public class AttendeeFunctions
     {
         private const AuthorizationLevel AccessLevel = AuthorizationLevel.Anonymous;
-        
-        private readonly AttendeeDataTables attendeeDataTables;
 
-        private static JsonSerializerSettings _serializerSettings = new JsonSerializerSettings()
+        private readonly AttendeeDataTables _attendeeDataTables;
+        private readonly bool _maskAttendees;
+
+        private static readonly JsonSerializerSettings SerializerSettings = new()
         {
             ContractResolver = new CamelCasePropertyNamesContractResolver()
         };
 
 
-        public AttendeeFunctions(AttendeeDataTables attendeeDataTables)
+        public AttendeeFunctions(AttendeeDataTables attendeeDataTables, IOptions<AttendeeMaskOptions> maskOptions)
         {
-            this.attendeeDataTables = attendeeDataTables;
+            _attendeeDataTables = attendeeDataTables;
+            if (maskOptions.Value.MaskAttendees.HasValue && !maskOptions.Value.MaskAttendees.Value)
+            {
+                _maskAttendees = false;
+            }
+            else
+            {
+                _maskAttendees = true;
+            }
         }
 
         [FunctionName("getTeams")]
@@ -34,7 +46,7 @@ namespace Innovate
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "teams")]
             HttpRequest req, ILogger log)
         {
-            var teams = await attendeeDataTables.GetTeamsAsync();
+            var teams = await _attendeeDataTables.GetTeamsAsync();
             return new OkObjectResult(teams);
         }
 
@@ -51,7 +63,7 @@ namespace Innovate
                 team.Id = UniqueId.Next();
             }
 
-            await attendeeDataTables.UpsertTeamAsync(team);
+            await _attendeeDataTables.UpsertTeamAsync(team);
 
             await signalRMessages.AddAsync(
                 new SignalRMessage
@@ -69,7 +81,13 @@ namespace Innovate
             string teamId,
             ILogger log)
         {
-            var teamMembers = await attendeeDataTables.GetTeamMembersAsync(teamId);
+            var teamMembers = await _attendeeDataTables.GetTeamMembersAsync(teamId);
+            if (_maskAttendees)
+            {
+                Random r = new Random();
+                teamMembers = teamMembers.Select(a => MapAttendee(a, r)).ToList();
+            }
+
             return new OkObjectResult(teamMembers);
         }
 
@@ -88,13 +106,19 @@ namespace Innovate
             }
 
             attendee.TeamId = teamId;
-            await attendeeDataTables.UpsetAttendeeAsync(attendee);
+            await _attendeeDataTables.UpsetAttendeeAsync(attendee);
 
             await signalRMessages.AddAsync(
                 new SignalRMessage
                 {
                     Target = "attendeeUpdated"
                 });
+
+            if (_maskAttendees)
+            {
+                Random r = new Random();
+                attendee = MapAttendee(attendee, r);
+            }
 
             return new OkObjectResult(attendee);
         }
@@ -109,7 +133,7 @@ namespace Innovate
             ILogger log,
             [SignalR(HubName = "serverless")] IAsyncCollector<SignalRMessage> signalRMessages)
         {
-            await attendeeDataTables.DeleteAttendeeAsync(teamId, attendeeId);
+            await _attendeeDataTables.DeleteAttendeeAsync(teamId, attendeeId);
 
             await signalRMessages.AddAsync(
                 new SignalRMessage
@@ -126,7 +150,7 @@ namespace Innovate
             HttpRequest req,
             [SignalR(HubName = "serverless")] IAsyncCollector<SignalRMessage> signalRMessages)
         {
-            await attendeeDataTables.ResetAttendanceAsync();
+            await _attendeeDataTables.ResetAttendanceAsync();
 
             await signalRMessages.AddAsync(
                 new SignalRMessage
@@ -135,7 +159,6 @@ namespace Innovate
                 });
             return new AcceptedResult();
         }
-
 
         [FunctionName("selectAttendee")]
         public async Task<IActionResult> SelectAttendee(
@@ -148,11 +171,11 @@ namespace Innovate
         {
             var signInReceipt = await req.ReadFromJsonAsync<SignInReceipt>();
             var attendee =
-                await attendeeDataTables.SignInAttendeeAsync(teamId, attendeeId, signInReceipt?.PhotoConsent);
+                await _attendeeDataTables.SignInAttendeeAsync(teamId, attendeeId, signInReceipt?.PhotoConsent);
 
             if (attendee == null) return new BadRequestObjectResult("Attendee does not exist");
 
-            var json = JsonConvert.SerializeObject(attendee, _serializerSettings);
+            var json = JsonConvert.SerializeObject(attendee, SerializerSettings);
 
             await signalRMessages.AddAsync(
                 new SignalRMessage
@@ -168,6 +191,16 @@ namespace Innovate
                 });
 
             return new AcceptedResult();
+        }
+
+        private static AttendeeEntity MapAttendee(AttendeeEntity attendee, Random random)
+        {
+            return attendee with
+            {
+                Name = FakeNameData.GenerateName(random),
+                JobTitle = FakeJobTitleData.GetRandomJobTitle(random),
+                ProfilePictureUrl = $"https://picsum.photos/seed/{attendee.Id}/512/512"
+            };
         }
     }
 }

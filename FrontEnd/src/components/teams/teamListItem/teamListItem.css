@@ -13,8 +13,10 @@
         text-align: center;
     }
 
-    .name {
-        font-size: 50px;
+    > .team-info {
+        .name {
+            font-size: 50px;
+        }
     }
 
     .problem {
