@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Innovate.Data;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
@@ -19,6 +18,11 @@ namespace Innovate
                 .Configure<IConfiguration>((settings, configuration) =>
                 {
                     configuration.GetSection("AzureTableStorageOptions").Bind(settings);
+                });
+            builder.Services.AddOptions<AttendeeMaskOptions>()
+                .Configure<IConfiguration>((settings, configuration) =>
+                {
+                    configuration.GetSection("MaskAttendeeOptions").Bind(settings);
                 });
 
             builder.Services.AddMvcCore().AddNewtonsoftJson(options =>
