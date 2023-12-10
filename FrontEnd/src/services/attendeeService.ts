@@ -21,7 +21,7 @@ export default class AttendeeService {
   }
 
   public static async getAttendeeCounts(): Promise<AttendeeCounts> {
-    let data = await this.get(url + attendeesPath + "/" + "count");
+    let data = await this.get(url + attendeesPath + "/count");
     return data as AttendeeCounts;
   }
 
