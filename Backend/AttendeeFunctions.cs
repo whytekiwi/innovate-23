@@ -18,7 +18,7 @@ namespace Innovate
 {
     public class AttendeeFunctions
     {
-        private const AuthorizationLevel AccessLevel = AuthorizationLevel.Anonymous;
+        private const AuthorizationLevel AccessLevel = AuthorizationLevel.Admin;
 
         private readonly AttendeeDataTables _attendeeDataTables;
         private readonly bool _maskAttendees;

@@ -1,72 +1,38 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import Connector from '../../services/signalr-connection';
 import {AttendeeEntity} from "../../models/attendeeEntity";
-import "./welcome.css";
 import InnovateFont from "../../components/shared/innovateFont/innovateFont";
+import {useStores} from "../../stores/rootStore";
+import {observer} from "mobx-react";
+import "./welcome.css";
+import {Fade} from "reactstrap";
 
 function Welcome() {
   const {onAttendeeSelected} = Connector();
 
-  const [attendee, setAttendee] = useState<AttendeeEntity>();
-  const [showAttendee, setShowAttendee] = useState<boolean>(false);
-  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout>();
+  const {attendeeDomainStore} = useStores();
+
+  const attendee = attendeeDomainStore.selectedAttendee;
 
   useEffect(() => {
-
-      const delay = (task: () => void, ms: number) => {
-
-        if (timeoutId) {
-          clearTimeout(timeoutId);
-        }
-
-        return new Promise<void>((resolve) => {
-          const id = setTimeout(() => {
-            task();
-            resolve();
-          }, ms);
-          setTimeoutId(id);
-        });
-      }
-
-      const clearAttendee = () => {
-
-        setShowAttendee(false);
-
-        return delay(() => {
-          setAttendee(undefined);
-        }, 1200);
-      }
-
-      const setAttendeeAndShow = (attendee?: AttendeeEntity) => {
-        setAttendee(attendee);
-        setShowAttendee(true);
-
-
-        delay(() => {
-          clearAttendee();
-        }, 6000);
-      }
-
-      const handleAttendeeSelected = async (newAttendee?: AttendeeEntity) => {
-        if (attendee) {
-
-          setShowAttendee(false);
-
-          return delay(() => {
-            setAttendeeAndShow(newAttendee);
-          }, 1200);
-        } else {
-          setAttendeeAndShow(newAttendee);
-        }
+      const handleAttendeeSelected = (attendee: AttendeeEntity) => {
+        attendeeDomainStore.selectAttendee(attendee);
       }
 
       onAttendeeSelected((attendee) => handleAttendeeSelected(attendee))
-    }, [onAttendeeSelected, attendee, timeoutId]
+    }, [onAttendeeSelected, attendeeDomainStore]
   )
+
+  const formatClass = () => {
+    const classNames = ["attendee"];
+    if (attendeeDomainStore.attendeeIsVisible)
+      classNames.push("show");
+    return classNames.join(" ");
+  }
 
   return (
     <div className="welcome">
-      <div className={`attendee ${showAttendee && "show"}`}>
+      <div className={formatClass()}>
         {attendee && (
           <>
             {attendee.profilePictureUrl?.value &&
@@ -75,26 +41,36 @@ function Welcome() {
               <InnovateFont className="name">{attendee.name?.value}</InnovateFont>
               <div className="title">{attendee.jobTitle?.value}</div>
             </div>
-            {/*<div id="confettis">*/}
-            {/*  <div className="confetti"></div>*/}
-            {/*  <div className="confetti"></div>*/}
-            {/*  <div className="confetti"></div>*/}
-            {/*  <div className="confetti"></div>*/}
-            {/*  <div className="confetti"></div>*/}
-            {/*  <div className="confetti"></div>*/}
-            {/*  <div className="confetti"></div>*/}
-            {/*  <div className="confetti"></div>*/}
-            {/*  <div className="confetti"></div>*/}
-            {/*  <div className="confetti"></div>*/}
-            {/*</div>*/}
+            <div id="confettis">
+              <div className="confetti"></div>
+              <div className="confetti"></div>
+              <div className="confetti"></div>
+              <div className="confetti"></div>
+              <div className="confetti"></div>
+              <div className="confetti"></div>
+              <div className="confetti"></div>
+              <div className="confetti"></div>
+              <div className="confetti"></div>
+              <div className="confetti"></div>
+            </div>
           </>
         )}
       </div>
-      {/*<div id="decorations">*/}
-      {/*  <img src="/box.webp" alt="Box"/>*/}
-      {/*</div>*/}
+
+      <Fade in={!attendee} id="placeholder">
+        <InnovateFont className="title">Welcome to Innovate</InnovateFont>
+        <span id="loading">Loading attendee...</span>
+      </Fade>
+      <div id="decorations">
+        <img src="/box.webp" alt="Box" id="box"/>
+        <img src="/halo.png" alt="Halo" id="halo"/>
+        <div id="innovate-brand">
+          <span>Technology’s biggest event</span>
+          <InnovateFont id="brand">Innovate</InnovateFont>
+        </div>
+      </div>
     </div>
   );
 }
 
-export default Welcome;
+export default observer(Welcome);
