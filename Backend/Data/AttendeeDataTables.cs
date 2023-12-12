@@ -29,6 +29,11 @@ public class AttendeeDataTables
             .ToListAsync();
     }
 
+    public async Task<AttendeeEntity> GetAttendeeAsync(string teamId, string attendeeId)
+    {
+        return await _attendeesTable.GetEntityAsync<AttendeeEntity>(teamId, attendeeId);
+    }
+
     public async Task<TeamEntity> UpsertTeamAsync(TeamEntity team)
     {
         team.PartitionKey = "team";
