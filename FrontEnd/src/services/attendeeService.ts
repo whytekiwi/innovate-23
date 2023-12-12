@@ -20,12 +20,6 @@ export default class AttendeeService {
     });
   }
 
-  public static async moveAttendee(attendeeId: string, fromTeamId: string, toTeamId: string) {
-    await fetch(url + teamsPath + "/" + fromTeamId + "/" + attendeesPath + "/" + attendeeId + "/move/" + toTeamId, {
-      method: "post"
-    });
-  }
-
   public static async getAttendeeCounts(): Promise<AttendeeCounts> {
     let data = await this.get(url + attendeesPath + "/count");
     return data as AttendeeCounts;
@@ -40,8 +34,12 @@ export default class AttendeeService {
     await this.post(url + teamsPath, team.toJson())
   }
 
-  public static async postAttendee(attendee: AttendeeEntity): Promise<void> {
-    await this.post(url + teamsPath + "/" + attendee.teamId + "/" + attendeesPath, attendee.toJson());
+  public static async postAttendee(attendee: AttendeeEntity, selectedTeam?: string): Promise<void> {
+    let u = url + teamsPath + "/" + attendee.teamId + "/" + attendeesPath
+    if (selectedTeam) {
+      u = u + "?newTeamId=" + selectedTeam;
+    }
+    await this.post(u, attendee.toJson());
   }
 
   public static async getAttendeesForTeam(teamId: string): Promise<AttendeeEntity[]> {

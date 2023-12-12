@@ -150,22 +150,26 @@ export class AttendeeDomainStore {
     const attendees = this.attendees.get(attendee.teamId) ?? [];
     attendees?.push(attendee);
     this.attendees.set(attendee.teamId, attendees);
+    this.loadCounts();
   }
 
   onAttendeeUpdated(attendee: AttendeeEntity) {
     let attendees = this.attendees.get(attendee.teamId) ?? [];
     attendees = attendees.map(a => a.id === attendee.id ? attendee : a)
     this.attendees.set(attendee.teamId, attendees);
+    this.loadCounts();
   }
 
   onAttendeeRemoved(attendeeId: string, teamId: string) {
     let attendees = this.attendees.get(teamId) ?? [];
     attendees = attendees.filter(at => at.id !== attendeeId);
     this.attendees.set(teamId, attendees);
+    this.loadCounts();
   }
 
   resetAll() {
     this.teams = undefined;
     this.attendees = new Map<string, AttendeeEntity[]>();
+    this.loadCounts();
   }
 }
