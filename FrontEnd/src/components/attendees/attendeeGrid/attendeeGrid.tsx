@@ -12,11 +12,10 @@ import "./attendeeGrid.css";
 export interface IAttendeeGridProps {
   teamId: string;
   isEdit?: boolean;
-  searchText?: string;
 }
 
 const AttendeeGrid: React.FC<IAttendeeGridProps> = (props) => {
-  const {teamId, isEdit, searchText} = props;
+  const {teamId, isEdit} = props;
 
   const {attendeeDomainStore} = useStores();
   const isLoading = attendeeDomainStore.isLoadingAttendeesForTeam(teamId);
@@ -61,27 +60,19 @@ const AttendeeGrid: React.FC<IAttendeeGridProps> = (props) => {
     setIsConsentDialogOpen(false);
   }
 
-  const searchTextLower = searchText?.toLowerCase() ?? "";
-  const matchAttendee = (attendee?: AttendeeEntity): boolean => {
-    const attendeeName = attendee?.name.value?.toLowerCase();
-    if (attendeeName)
-      return attendeeName.includes(searchTextLower);
-    return false;
-  }
-
-  const filteredAttendees = (attendees && searchText) ? attendees.filter(matchAttendee) : attendees;
-
   return (
     <div className="attendee-grid">
       {isLoading && <LoadingSpinner/>}
-      {filteredAttendees && filteredAttendees.map((attendee) => (
-        <AttendeeListItem
-          attendee={attendee}
-          key={attendee.id}
-          isEdit={isEdit}
-          onAttendeeEdit={handleEditAttendee}
-          onAttendeeSelected={handleAttendeeSelected}/>
-      ))}
+      {attendees && attendees
+        .filter((at) => attendeeDomainStore.attendeeMatchesFilter(at))
+        .map((attendee) => (
+          <AttendeeListItem
+            attendee={attendee}
+            key={attendee.id}
+            isEdit={isEdit}
+            onAttendeeEdit={handleEditAttendee}
+            onAttendeeSelected={handleAttendeeSelected}/>
+        ))}
       {isEdit && (
         <>
           <Button onClick={handleOpenEditDialog}>Add</Button>

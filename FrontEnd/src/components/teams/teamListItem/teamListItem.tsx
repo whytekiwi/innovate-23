@@ -9,11 +9,10 @@ export interface ITeamListItemProps {
   team: TeamEntity;
   isEdit?: boolean;
   onEditTeam: (team: TeamEntity) => void;
-  searchText?: string;
 }
 
 const TeamListItem: React.FC<ITeamListItemProps> = (props) => {
-  const {team, isEdit, onEditTeam, searchText} = props;
+  const {team, isEdit, onEditTeam} = props;
 
   const handleEditTeam = () => {
     onEditTeam(team);
@@ -28,7 +27,7 @@ const TeamListItem: React.FC<ITeamListItemProps> = (props) => {
         </div>
         {isEdit && <Button onClick={handleEditTeam}>Edit</Button>}
       </div>
-      {team.id && <AttendeeGrid isEdit={isEdit} teamId={team.id} searchText={searchText}/>}
+      {team.id && <AttendeeGrid isEdit={isEdit} teamId={team.id}/>}
     </div>
   )
     ;

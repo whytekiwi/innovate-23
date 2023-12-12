@@ -5,7 +5,7 @@ body {
     sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    min-height: 1vh;
+    min-height: 100dvh;
     background: radial-gradient(circle at top left, rgba(132, 79, 232, 1) 0%, rgba(85, 44, 234, 1) 40%, rgba(15, 18, 123, 1) 100%) 0 0;
     font-family: 'Gill Sans MT', sans-serif;
     overflow-x: scroll;

@@ -10,11 +10,10 @@ import LoadingSpinner from "../../shared/loadingSpinner/loadingSpinner";
 
 export interface ITeamsGridProps {
   isEdit?: boolean;
-  searchText?: string;
 }
 
 const TeamsGrid: React.FC<ITeamsGridProps> = (props) => {
-  const {isEdit, searchText} = props;
+  const {isEdit} = props;
 
   const {attendeeDomainStore} = useStores();
   const isLoading = attendeeDomainStore.isLoadingTeams;
@@ -46,8 +45,9 @@ const TeamsGrid: React.FC<ITeamsGridProps> = (props) => {
     <div className="team-grid">
       {isLoading && <LoadingSpinner/>}
       {teams && teams
+        .filter((t) => attendeeDomainStore.teamMatchesFilter(t))
         .map((team) => (
-          <TeamListItem team={team} isEdit={isEdit} key={team.id} onEditTeam={handleEditTeam} searchText={searchText}/>
+          <TeamListItem team={team} isEdit={isEdit} key={team.id} onEditTeam={handleEditTeam}/>
         ))}
       {isEdit && (
         <>

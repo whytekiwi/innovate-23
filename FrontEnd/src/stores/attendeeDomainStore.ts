@@ -15,6 +15,12 @@ export class AttendeeDomainStore {
   isLoadingTeams: boolean = false;
   teams?: TeamEntity[];
 
+  searchText: string = "";
+
+  setSearchText(text: string) {
+    this.searchText = text;
+  }
+
   private attendees: Map<string, AttendeeEntity[]>;
   private isLoadingAttendees: Map<string, boolean> = new Map<string, boolean>();
 
@@ -40,6 +46,15 @@ export class AttendeeDomainStore {
         this.clearAttendee();
       }, {
         delay: 10000
+      });
+
+    // Clear the search text after delay
+    reaction(
+      () => this.searchText,
+      () => {
+        this.setSearchText("");
+      }, {
+        delay: 30000
       });
   }
 
@@ -81,6 +96,23 @@ export class AttendeeDomainStore {
 
   get attendeeIsVisible(): boolean {
     return !!this.selectedAttendee && !this.isSwitchingAttendee;
+  }
+
+  teamMatchesFilter(team: TeamEntity) {
+    if (!this.searchText) return true;
+    if (!team.id) return false;
+    const attendees = this.attendees.get(team.id);
+    if (!attendees) return false;
+    return attendees.some(a => this.attendeeMatchesFilter(a));
+  }
+
+  attendeeMatchesFilter(attendee: AttendeeEntity) {
+    const searchText = this.searchText ?? "";
+    const searchTextLower = searchText.toLowerCase();
+    const attendeeName = attendee?.name.value?.toLowerCase();
+    if (attendeeName)
+      return attendeeName.includes(searchTextLower);
+    return false;
   }
 
   private switchAttendee(attendee: AttendeeEntity) {

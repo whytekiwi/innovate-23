@@ -1,15 +1,24 @@
-import React, {useState} from 'react';
+import React, {useEffect} from 'react';
 import TeamsGrid from "../../components/teams/teamsGrid/teamsGrid";
 import {Input, InputGroup, InputGroupText, Navbar, NavbarBrand} from "reactstrap";
-import './attendeesPage.css';
 import AttendeeCountDisplay from "../../components/attendees/attendeeCountDisplay/attendeeCountDisplay";
+import {useStores} from "../../stores/rootStore";
+import {observer} from "mobx-react";
+import './attendeesPage.css';
 
 function AttendeesPage() {
 
-  const [searchText, setSearchText] = useState("");
+  const {attendeeDomainStore} = useStores();
+  const searchText = attendeeDomainStore.searchText;
+
+  useEffect(() => {
+    return (() => {
+      attendeeDomainStore.setSearchText("");
+    })
+  }, [attendeeDomainStore]);
 
   const onSearchTextChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchText(event.target.value);
+    attendeeDomainStore.setSearchText(event.target.value);
   }
 
   return (
@@ -26,14 +35,14 @@ function AttendeesPage() {
         <div className="col-sm-5 right">
           <AttendeeCountDisplay/>
           <InputGroup>
-            <Input value={searchText} onChange={onSearchTextChanged}/>
+            <Input value={searchText} onChange={onSearchTextChanged} type="text"/>
             <InputGroupText>Search</InputGroupText>
           </InputGroup>
         </div>
       </Navbar>
-      <TeamsGrid searchText={searchText}/>
+      <TeamsGrid/>
     </div>
   );
 }
 
-export default AttendeesPage;
+export default observer(AttendeesPage);
