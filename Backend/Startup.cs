@@ -19,11 +19,6 @@ namespace Innovate
                 {
                     configuration.GetSection("AzureTableStorageOptions").Bind(settings);
                 });
-            builder.Services.AddOptions<AttendeeMaskOptions>()
-                .Configure<IConfiguration>((settings, configuration) =>
-                {
-                    configuration.GetSection("MaskAttendeeOptions").Bind(settings);
-                });
 
             builder.Services.AddMvcCore().AddNewtonsoftJson(options =>
                 options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver()

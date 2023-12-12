@@ -37,6 +37,8 @@
 
             .title {
                 font-size: 50px;
+                font-family: innovate, sans-serif;
+                text-transform: uppercase;
             }
         }
     }

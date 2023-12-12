@@ -1,4 +1,5 @@
 using System;
+using FunctionApp.Models;
 using Newtonsoft.Json;
 
 namespace Innovate.Models
@@ -13,6 +14,19 @@ namespace Innovate.Models
         public string? PhotoConsent { get; set; }
         public DateTimeOffset? LastCheckInDate { get; set; }
 
-        public bool HasSignedInToday => DateTimeOffset.UtcNow.DayOfYear == LastCheckInDate?.DayOfYear;
+        public bool HasSignedInToday
+        {
+            get
+            {
+                if (LastCheckInDate == null)
+                {
+                    return false;
+                }
+
+                var start = NewZealandDateTimeOffsetHelper.GetStartOfTodayNzInUtc();
+                var end = start.AddDays(1);
+                return LastCheckInDate >= start && LastCheckInDate < end;
+            }
+        }
     }
 }

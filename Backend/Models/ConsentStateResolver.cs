@@ -8,10 +8,10 @@ namespace Innovate
 
         public static string GetResolvedState(string? attendeeStatus, string? signInStatus)
         {
-            if (attendeeStatus == IsRemote || signInStatus == IsRemote)
-                return IsRemote;
-            if (attendeeStatus == ApprovesPhotos || signInStatus == ApprovesPhotos)
-                return ApprovesPhotos;
+            if (!string.IsNullOrEmpty(signInStatus)) return signInStatus;
+
+            if (!string.IsNullOrEmpty(attendeeStatus)) return attendeeStatus;
+
             return DeniesPhoto;
         }
     }

@@ -70,16 +70,21 @@ const PhotoConsentModal: React.FC<IPhotoConsentModalProps> = (props) => {
           </FormGroup>
         </Form>
 
-        {hasConsent === "no" && (
-          <Fade in={true}>
+        <Fade in={hasConsent === "yes" || hasConsent === "no"}>
+          {hasConsent === "no" && (
             <Alert color="danger">
-              Please take a red lanyard from the registration desk, to let the photographers know to avoid taking your
+              Please take a black lanyard from the registration desk, to let the photographers know to avoid taking your
               photo.<br/><br/>
 
               You must keep this lanyard visible at all times.
             </Alert>
-          </Fade>
-        )}
+          )}
+          {hasConsent === "yes" && (
+            <Alert color="success">
+              Please keep a colorful lanyard visible, to ensure the photographers know you have consented.
+            </Alert>
+          )}
+        </Fade>
       </ModalBody>
       <ModalFooter>
         <Button onClick={() => onConsent?.(hasConsent!)} disabled={hasConsent === undefined}

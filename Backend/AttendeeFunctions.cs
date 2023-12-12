@@ -10,7 +10,6 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.WebJobs.Extensions.SignalRService;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -18,10 +17,9 @@ namespace Innovate
 {
     public class AttendeeFunctions
     {
-        private const AuthorizationLevel AccessLevel = AuthorizationLevel.Admin;
+        private const AuthorizationLevel AccessLevel = AuthorizationLevel.Anonymous;
 
         private readonly AttendeeDataTables _attendeeDataTables;
-        private readonly bool _maskAttendees;
 
         private static readonly JsonSerializerSettings SerializerSettings = new()
         {
@@ -29,17 +27,9 @@ namespace Innovate
         };
 
 
-        public AttendeeFunctions(AttendeeDataTables attendeeDataTables, IOptions<AttendeeMaskOptions> maskOptions)
+        public AttendeeFunctions(AttendeeDataTables attendeeDataTables)
         {
             _attendeeDataTables = attendeeDataTables;
-            if (maskOptions.Value.MaskAttendees.HasValue && !maskOptions.Value.MaskAttendees.Value)
-            {
-                _maskAttendees = false;
-            }
-            else
-            {
-                _maskAttendees = true;
-            }
         }
 
         [FunctionName("getTeams")]
@@ -83,12 +73,6 @@ namespace Innovate
             ILogger log)
         {
             var teamMembers = await _attendeeDataTables.GetTeamMembersAsync(teamId);
-            if (_maskAttendees)
-            {
-                Random r = new Random();
-                teamMembers = teamMembers.Select(a => MapAttendee(a, r)).ToList();
-            }
-
             return new OkObjectResult(teamMembers);
         }
 
@@ -117,7 +101,6 @@ namespace Innovate
 
             return new OkObjectResult(attendee);
         }
-
 
         [FunctionName("deleteAttendee")]
         public async Task<IActionResult> DeleteAttendee(
@@ -187,12 +170,6 @@ namespace Innovate
                 await _attendeeDataTables.SignInAttendeeAsync(teamId, attendeeId, signInReceipt?.PhotoConsent);
 
             if (attendee == null) return new BadRequestObjectResult("Attendee does not exist");
-
-            if (_maskAttendees)
-            {
-                attendee = MapAttendee(attendee, new Random());
-            }
-
             var json = JsonConvert.SerializeObject(attendee, SerializerSettings);
 
             await signalRMessages.AddAsync(
@@ -209,16 +186,6 @@ namespace Innovate
                 });
 
             return new AcceptedResult();
-        }
-
-        private static AttendeeEntity MapAttendee(AttendeeEntity attendee, Random random)
-        {
-            return attendee with
-            {
-                Name = FakeNameData.GenerateName(random),
-                JobTitle = FakeJobTitleData.GetRandomJobTitle(random),
-                ProfilePictureUrl = $"https://picsum.photos/seed/{attendee.Id}/512/512"
-            };
         }
     }
 }

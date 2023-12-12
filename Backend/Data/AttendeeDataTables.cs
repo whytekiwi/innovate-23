@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Azure.Data.Tables;
+using FunctionApp.Models;
 using Innovate.Models;
 
 namespace Innovate.Data;
@@ -25,12 +26,6 @@ public class AttendeeDataTables
     public async Task<List<TeamEntity>> GetTeamsAsync()
     {
         return await _teamsTable.QueryAsync<TeamEntity>()
-            .ToListAsync();
-    }
-
-    public async Task<List<TeamEntity>> GetTeamAsync(string id)
-    {
-        return await _teamsTable.QueryAsync<TeamEntity>(at => at.RowKey == id)
             .ToListAsync();
     }
 
@@ -59,23 +54,28 @@ public class AttendeeDataTables
 
     public async Task<int> CountAttendeesAsync()
     {
-        DateTimeOffset thisMorning = DateTimeOffset.Now.Date.ToUniversalTime();
         return await _attendeesTable.QueryAsync<AttendeeEntity>()
             .CountAsync();
     }
 
     public async Task<int> CountSignedInAttendeesAsync()
     {
-        DateTimeOffset thisMorning = DateTimeOffset.Now.Date.ToUniversalTime();
-        return await _attendeesTable.QueryAsync<AttendeeEntity>(at => at.LastCheckInDate >= thisMorning)
+        var start = NewZealandDateTimeOffsetHelper.GetStartOfTodayNzInUtc();
+        var end = start.AddDays(1);
+        return await _attendeesTable.QueryAsync<AttendeeEntity>(at =>
+                at.LastCheckInDate >= start &&
+                at.LastCheckInDate < end)
             .CountAsync();
     }
 
     public async Task<int> CountSignedInRemoteAttendeesAsync()
     {
-        DateTimeOffset thisMorning = DateTimeOffset.Now.Date.ToUniversalTime();
-        return await _attendeesTable
-            .QueryAsync<AttendeeEntity>(at => at.LastCheckInDate >= thisMorning && at.PhotoConsent == "remote")
+        var start = NewZealandDateTimeOffsetHelper.GetStartOfTodayNzInUtc();
+        var end = start.AddDays(1);
+        return await _attendeesTable.QueryAsync<AttendeeEntity>(at =>
+                at.LastCheckInDate >= start &&
+                at.LastCheckInDate < end &&
+                at.PhotoConsent == "remote")
             .CountAsync();
     }
 
