@@ -9,12 +9,11 @@ export interface IAddTeamDialogProps {
   toggle: () => void;
   isOpen: boolean;
   selectedTeam: TeamEntity;
-  onTeamAdded: () => void;
 }
 
 const AddTeamDialog: React.FC<IAddTeamDialogProps> = (props) => {
 
-  const {toggle, isOpen, selectedTeam, onTeamAdded} = props;
+  const {toggle, isOpen, selectedTeam} = props;
   const [isSaving, setIsSaving] = useState<boolean>(false);
 
   const title = selectedTeam.id ? "Edit Team" : "Add New Team";
@@ -24,7 +23,6 @@ const AddTeamDialog: React.FC<IAddTeamDialogProps> = (props) => {
     setIsSaving(true);
     await AttendeeService.postTeam(selectedTeam);
     setIsSaving(false);
-    onTeamAdded();
     toggle();
   };
 

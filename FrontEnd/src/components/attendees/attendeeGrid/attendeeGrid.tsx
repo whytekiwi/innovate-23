@@ -2,10 +2,11 @@ import React, {useEffect, useState} from "react";
 import {AttendeeEntity} from "../../../models/attendeeEntity";
 import AttendeeListItem from "../attendeeListItem/attendeeListItem";
 import {Button} from "reactstrap";
-import AttendeeService from "../../../services/attendeeService";
 import AddAttendeeDialog from "../addAttendeeDialog/addAttendeeDialog";
 import LoadingSpinner from "../../shared/loadingSpinner/loadingSpinner";
-import Connector from "../../../services/signalr-connection";
+import PhotoConsentModal from "../photoConsentModal/photoConsentModal";
+import {useStores} from "../../../stores/rootStore";
+import {observer} from "mobx-react";
 import "./attendeeGrid.css";
 
 export interface IAttendeeGridProps {
@@ -17,38 +18,47 @@ export interface IAttendeeGridProps {
 const AttendeeGrid: React.FC<IAttendeeGridProps> = (props) => {
   const {teamId, isEdit, searchText} = props;
 
-  const {onAttendeeUpdated} = Connector();
-
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [attendees, setAttendees] = useState<AttendeeEntity[]>([]);
-  const [selectedAttendee, setSelectedAttendee] = useState<AttendeeEntity>(new AttendeeEntity(teamId));
-  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
-
+  const {attendeeDomainStore} = useStores();
+  const isLoading = attendeeDomainStore.isLoadingAttendeesForTeam(teamId);
+  const attendees = attendeeDomainStore.attendeesForTeam(teamId);
 
   useEffect(() => {
-    const loadAttendees = async () => {
-      const attendees = await AttendeeService.getAttendeesForTeam(teamId);
-      setAttendees(attendees);
-      setIsLoading(false);
+    if (!attendees && !isLoading) {
+      attendeeDomainStore.loadAttendeesForTeam(teamId);
     }
+  }, [attendeeDomainStore, isLoading, attendees, teamId]);
 
-    loadAttendees();
-    onAttendeeUpdated(() => loadAttendees());
+  const [selectedAttendee, setSelectedAttendee] = useState<AttendeeEntity>();
+  const [selectedEditAttendee, setSelectedEditAttendee] = useState<AttendeeEntity>(new AttendeeEntity(teamId));
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState<boolean>(false);
+  const [isConsentDialogOpen, setIsConsentDialogOpen] = useState<boolean>(false);
 
-  }, [teamId, onAttendeeUpdated]);
-
-  const handleOpenDialog = () => {
-    setIsDialogOpen(true);
+  const handleOpenEditDialog = () => {
+    setIsEditDialogOpen(true);
   }
 
-  const handleCloseDialog = () => {
-    setIsDialogOpen(false);
-    setSelectedAttendee(new AttendeeEntity(teamId));
+  const handleCloseEditDialog = () => {
+    setIsEditDialogOpen(false);
+    setSelectedEditAttendee(new AttendeeEntity(teamId));
   }
 
   const handleEditAttendee = (attendee: AttendeeEntity) => {
-    setSelectedAttendee(attendee);
-    setIsDialogOpen(true);
+    if (isEdit) {
+      setSelectedEditAttendee(attendee);
+      setIsEditDialogOpen(true);
+    }
+  }
+
+  const handleAttendeeSelected = (attendee: AttendeeEntity) => {
+    if (!isEdit) {
+      setSelectedAttendee(attendee);
+      setIsConsentDialogOpen(true);
+    }
+  }
+
+  const handleCloseConsentModal = () => {
+    setSelectedAttendee(undefined);
+    setIsConsentDialogOpen(false);
   }
 
   const searchTextLower = searchText?.toLowerCase() ?? "";
@@ -69,20 +79,25 @@ const AttendeeGrid: React.FC<IAttendeeGridProps> = (props) => {
           attendee={attendee}
           key={attendee.id}
           isEdit={isEdit}
-          onAttendeeEdit={handleEditAttendee}/>
+          onAttendeeEdit={handleEditAttendee}
+          onAttendeeSelected={handleAttendeeSelected}/>
       ))}
       {isEdit && (
         <>
-          <Button onClick={handleOpenDialog}>Add</Button>
+          <Button onClick={handleOpenEditDialog}>Add</Button>
           <AddAttendeeDialog
-            toggle={handleCloseDialog}
-            isOpen={isDialogOpen}
-            attendee={selectedAttendee}
+            toggle={handleCloseEditDialog}
+            isOpen={isEditDialogOpen}
+            attendee={selectedEditAttendee}
           />
         </>
       )}
+      {
+        selectedAttendee &&
+          <PhotoConsentModal attendee={selectedAttendee} toggle={handleCloseConsentModal} isOpen={isConsentDialogOpen}/>
+      }
     </div>
   );
 };
 
-export default AttendeeGrid;
+export default observer(AttendeeGrid);

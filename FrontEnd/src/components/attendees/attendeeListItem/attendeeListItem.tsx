@@ -1,10 +1,7 @@
-import React, {useState} from "react";
+import React from "react";
 import {AttendeeEntity} from "../../../models/attendeeEntity";
 import "./attendeeListItem.css";
-import AttendeeService from "../../../services/attendeeService";
 import {Button} from "reactstrap";
-import PhotoConsentModal from "../photoConsentModal/photoConsentModal";
-import {ConsentState} from "../../../models/consentState";
 import Tick from "../../shared/icons/tick";
 import Remote from "../../shared/icons/remote";
 
@@ -12,29 +9,14 @@ export interface IAttendeeListItemProps {
   attendee: AttendeeEntity;
   isEdit?: boolean;
   onAttendeeEdit: (attendee: AttendeeEntity) => void;
+  onAttendeeSelected: (attendee: AttendeeEntity) => void;
 }
 
 const AttendeeListItem: React.FC<IAttendeeListItemProps> = (props) => {
-  const {attendee, isEdit, onAttendeeEdit} = props;
+  const {attendee, isEdit, onAttendeeEdit, onAttendeeSelected} = props;
 
   const handleAttendeeClicked = async () => {
-    if (!isEdit)
-      handleOpenModal();
-  }
-
-  const handlePhotoConsent = async (consentState?: ConsentState) => {
-    await AttendeeService.selectAttendee(attendee.teamId, attendee.id, consentState);
-    handleCloseModal();
-  }
-
-  const [isModalOpen, setModalOpen] = useState(false);
-
-  const handleOpenModal = () => {
-    setModalOpen(true);
-  }
-
-  const handleCloseModal = () => {
-    setModalOpen(false);
+    onAttendeeSelected(attendee);
   }
 
   const handleAttendeeEdit = () => {
@@ -75,7 +57,6 @@ const AttendeeListItem: React.FC<IAttendeeListItemProps> = (props) => {
         </div>
       </div>
       {isEdit && <Button onClick={handleAttendeeEdit}>Edit</Button>}
-      <PhotoConsentModal toggle={handleCloseModal} isOpen={isModalOpen} onConsent={handlePhotoConsent}/>
     </div>
   );
 };

@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using System.Threading.Tasks;
 using FunctionApp.Models;
 using Innovate.Data;
@@ -25,7 +23,6 @@ namespace Innovate
         {
             ContractResolver = new CamelCasePropertyNamesContractResolver()
         };
-
 
         public AttendeeFunctions(AttendeeDataTables attendeeDataTables)
         {
@@ -54,15 +51,17 @@ namespace Innovate
                 team.Id = UniqueId.Next();
             }
 
-            await _attendeeDataTables.UpsertTeamAsync(team);
+            team = await _attendeeDataTables.UpsertTeamAsync(team);
+            var json = JsonConvert.SerializeObject(team, SerializerSettings);
 
             await signalRMessages.AddAsync(
                 new SignalRMessage
                 {
-                    Target = "attendeeUpdated"
+                    Target = "teamUpdated",
+                    Arguments = new object[] { json }
                 });
 
-            return new OkObjectResult(team);
+            return new AcceptedResult();
         }
 
         [FunctionName("getMembersForTeam")]
@@ -84,22 +83,60 @@ namespace Innovate
             ILogger log,
             [SignalR(HubName = "serverless")] IAsyncCollector<SignalRMessage> signalRMessages)
         {
+            bool isCreating = false;
             var attendee = await req.ReadFromJsonAsync<AttendeeEntity>();
             if (string.IsNullOrEmpty(attendee.Id))
             {
+                isCreating = true;
                 attendee.Id = UniqueId.Next();
             }
 
             attendee.TeamId = teamId;
-            await _attendeeDataTables.UpsetAttendeeAsync(attendee);
+            attendee = await _attendeeDataTables.UpsertAttendeeAsync(attendee);
+
+            var target = isCreating ? "attendeeAdded" : "attendeeUpdated";
+            var json = JsonConvert.SerializeObject(attendee, SerializerSettings);
 
             await signalRMessages.AddAsync(
                 new SignalRMessage
                 {
-                    Target = "attendeeUpdated"
+                    Target = target,
+                    Arguments = new object[] { json }
                 });
 
-            return new OkObjectResult(attendee);
+            return new AcceptedResult();
+        }
+
+        [FunctionName("moveAttendee")]
+        public async Task<IActionResult> MoveAttendee(
+            [HttpTrigger(AccessLevel, "post", Route = "teams/{fromTeamId}/attendees/{attendeeId}/move/{toTeamId}")]
+            HttpRequest req,
+            string fromTeamId,
+            string attendeeId,
+            string toTeamId,
+            ILogger log,
+            [SignalR(HubName = "serverless")] IAsyncCollector<SignalRMessage> signalRMessages)
+        {
+            var attendee = await _attendeeDataTables.MoveAttendeesTeamAsync(attendeeId, fromTeamId, toTeamId);
+            if (attendee == null) return new BadRequestObjectResult("Attendee does not exist");
+
+            var attendeeJson = JsonConvert.SerializeObject(attendee, SerializerSettings);
+            var deletedJson = JsonConvert.SerializeObject(new { attendeeId, teamId = fromTeamId }, SerializerSettings);
+
+            await signalRMessages.AddAsync(
+                new SignalRMessage
+                {
+                    Target = "attendeeRemoved",
+                    Arguments = new object[] { deletedJson }
+                });
+            await signalRMessages.AddAsync(
+                new SignalRMessage
+                {
+                    Target = "attendeeAdded",
+                    Arguments = new object[] { attendeeJson }
+                });
+
+            return new AcceptedResult();
         }
 
         [FunctionName("deleteAttendee")]
@@ -113,10 +150,13 @@ namespace Innovate
         {
             await _attendeeDataTables.DeleteAttendeeAsync(teamId, attendeeId);
 
+            var json = JsonConvert.SerializeObject(new { attendeeId, teamId }, SerializerSettings);
+
             await signalRMessages.AddAsync(
                 new SignalRMessage
                 {
-                    Target = "attendeeUpdated"
+                    Target = "attendeeRemoved",
+                    Arguments = new object[] { json }
                 });
 
             return new OkResult();
@@ -151,7 +191,7 @@ namespace Innovate
             await signalRMessages.AddAsync(
                 new SignalRMessage
                 {
-                    Target = "attendeeUpdated"
+                    Target = "resetAll"
                 });
             return new AcceptedResult();
         }
@@ -182,7 +222,8 @@ namespace Innovate
             await signalRMessages.AddAsync(
                 new SignalRMessage
                 {
-                    Target = "attendeeUpdated"
+                    Target = "attendeeUpdated",
+                    Arguments = new object[] { json }
                 });
 
             return new AcceptedResult();

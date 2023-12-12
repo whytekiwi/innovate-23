@@ -1,32 +1,30 @@
-import React, {useEffect, useState} from "react";
-import {AttendeeCounts} from "../../../models/attendeeCounts";
+import React, {useEffect} from "react";
+import {useStores} from "../../../stores/rootStore";
 import "./attendeeCountDisplay.css";
-import AttendeeService from "../../../services/attendeeService";
-import Connector from "../../../services/signalr-connection";
+import {observer} from "mobx-react";
 
 const AttendeeCountsDisplay = () => {
-  const [counts, setAttendeeCounts] = useState<AttendeeCounts>();
 
-  const {onAttendeeUpdated} = Connector();
+  const {attendeeDomainStore} = useStores();
+  const counts = attendeeDomainStore.attendeeCounts;
 
 
   useEffect(() => {
-    async function loadCounts() {
-      const counts = await AttendeeService.getAttendeeCounts();
-      setAttendeeCounts(counts);
-    }
-
-    loadCounts();
-    onAttendeeUpdated(() => loadCounts());
-  }, [onAttendeeUpdated]);
+    if (!counts && !attendeeDomainStore.isLoadingCounts)
+      attendeeDomainStore.loadCounts();
+  }, [attendeeDomainStore, counts]);
 
   return (
     <div className="attendee-counts">
-      <span>{counts?.total}</span>
-      <span className="signed-in">{counts?.signedIn}</span>
-      <span className="remote">{counts?.remoteSignedIn}</span>
+      {counts &&
+          <>
+              <span>{counts?.total}</span>
+              <span className="signed-in">{counts?.signedIn}</span>
+              <span className="remote">{counts?.remoteSignedIn}</span>
+          </>
+      }
     </div>
   );
 }
 
-export default AttendeeCountsDisplay;
+export default observer(AttendeeCountsDisplay);

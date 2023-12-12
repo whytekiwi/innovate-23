@@ -29,16 +29,18 @@ public class AttendeeDataTables
             .ToListAsync();
     }
 
-    public async Task UpsertTeamAsync(TeamEntity team)
+    public async Task<TeamEntity> UpsertTeamAsync(TeamEntity team)
     {
         team.PartitionKey = "team";
         await _teamsTable.UpsertEntityAsync(team);
+        return team;
     }
 
-    public async Task UpsetAttendeeAsync(AttendeeEntity attendee)
+    public async Task<AttendeeEntity> UpsertAttendeeAsync(AttendeeEntity attendee)
     {
         attendee.PartitionKey = attendee.TeamId ?? "";
         await _attendeesTable.UpsertEntityAsync(attendee);
+        return attendee;
     }
 
     public async Task DeleteAttendeeAsync(string teamId, string attendeeId)
@@ -90,6 +92,24 @@ public class AttendeeDataTables
         }
     }
 
+    public async Task<AttendeeEntity?> MoveAttendeesTeamAsync(string attendeeId, string fromTeamId, string toTeamId)
+    {
+        AttendeeEntity? attendee = await _attendeesTable.GetEntityAsync<AttendeeEntity>(fromTeamId, attendeeId);
+        if (attendee == null)
+        {
+            return null;
+        }
+
+        var newAttendee = attendee with { TeamId = toTeamId };
+
+        var deleteAction = new TableTransactionAction(TableTransactionActionType.Delete, attendee);
+        var createAction =
+            new TableTransactionAction(TableTransactionActionType.Add, newAttendee);
+
+        await _attendeesTable.SubmitTransactionAsync(new[] { deleteAction, createAction });
+        return newAttendee;
+    }
+
     public async Task<AttendeeEntity?> SignInAttendeeAsync(string teamId, string attendeeId, string? givesPhotoConsent)
     {
         AttendeeEntity? attendee = await _attendeesTable.GetEntityAsync<AttendeeEntity>(teamId, attendeeId);
@@ -101,7 +121,7 @@ public class AttendeeDataTables
         attendee.PhotoConsent = ConsentStateResolver.GetResolvedState(attendee.PhotoConsent, givesPhotoConsent);
         attendee.LastCheckInDate = DateTimeOffset.UtcNow;
 
-        await UpsetAttendeeAsync(attendee);
+        await UpsertAttendeeAsync(attendee);
 
         var receipt = new SignInReceipt
         {

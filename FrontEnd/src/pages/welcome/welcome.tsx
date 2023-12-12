@@ -1,27 +1,15 @@
-import React, {useEffect} from 'react';
-import Connector from '../../services/signalr-connection';
-import {AttendeeEntity} from "../../models/attendeeEntity";
+import React from 'react';
 import InnovateFont from "../../components/shared/innovateFont/innovateFont";
 import {useStores} from "../../stores/rootStore";
 import {observer} from "mobx-react";
-import "./welcome.css";
 import {Fade} from "reactstrap";
+import "./welcome.css";
 
 function Welcome() {
-  const {onAttendeeSelected} = Connector();
 
   const {attendeeDomainStore} = useStores();
 
   const attendee = attendeeDomainStore.selectedAttendee;
-
-  useEffect(() => {
-      const handleAttendeeSelected = (attendee: AttendeeEntity) => {
-        attendeeDomainStore.selectAttendee(attendee);
-      }
-
-      onAttendeeSelected((attendee) => handleAttendeeSelected(attendee))
-    }, [onAttendeeSelected, attendeeDomainStore]
-  )
 
   const formatClass = () => {
     const classNames = ["attendee"];

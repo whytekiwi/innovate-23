@@ -15,20 +15,28 @@ import {
 import QRCode from "qrcode.react";
 import {ConsentState} from "../../../models/consentState";
 import "./photoConsentModal.css";
+import {AttendeeEntity} from "../../../models/attendeeEntity";
+import AttendeeService from "../../../services/attendeeService";
 
 export interface IPhotoConsentModalProps {
-  onConsent?: (consentState: ConsentState) => void;
+  attendee: AttendeeEntity;
   toggle: () => void;
   isOpen: boolean;
 }
 
 const PhotoConsentModal: React.FC<IPhotoConsentModalProps> = (props) => {
-  const {isOpen, toggle, onConsent} = props;
+  const {attendee, isOpen, toggle} = props;
 
   const [hasConsent, setHasConsent] = useState<ConsentState | null>();
 
   const handleConsentState = (hasConsent: ConsentState) => {
     setHasConsent(hasConsent);
+  }
+
+  const handleConsentSubmit = async () => {
+    if (hasConsent)
+      await AttendeeService.selectAttendee(attendee, hasConsent);
+    toggle();
   }
 
   return (
@@ -87,7 +95,7 @@ const PhotoConsentModal: React.FC<IPhotoConsentModalProps> = (props) => {
         </Fade>
       </ModalBody>
       <ModalFooter>
-        <Button onClick={() => onConsent?.(hasConsent!)} disabled={hasConsent === undefined}
+        <Button onClick={handleConsentSubmit} disabled={hasConsent === undefined}
                 color="primary">Submit</Button>
       </ModalFooter>
     </Modal>

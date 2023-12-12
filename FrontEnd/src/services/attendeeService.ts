@@ -8,8 +8,8 @@ const attendeesPath = "attendees";
 const teamsPath = "teams";
 
 export default class AttendeeService {
-  public static async selectAttendee(teamId?: string, attendeeId?: string, consentState?: ConsentState) {
-    await this.post(url + teamsPath + "/" + teamId + "/" + attendeesPath + "/" + attendeeId, JSON.stringify({
+  public static async selectAttendee(attendee: AttendeeEntity, consentState: ConsentState) {
+    await this.post(url + teamsPath + "/" + attendee.teamId + "/" + attendeesPath + "/" + attendee.id, JSON.stringify({
       photoConsent: consentState
     }));
   }
@@ -17,6 +17,12 @@ export default class AttendeeService {
   public static async deleteAttendee(attendee: AttendeeEntity) {
     await fetch(url + teamsPath + "/" + attendee.teamId + "/" + attendeesPath + "/" + attendee.id, {
       method: "DELETE"
+    });
+  }
+
+  public static async moveAttendee(attendeeId: string, fromTeamId: string, toTeamId: string) {
+    await fetch(url + teamsPath + "/" + fromTeamId + "/" + attendeesPath + "/" + attendeeId + "/move/" + toTeamId, {
+      method: "post"
     });
   }
 

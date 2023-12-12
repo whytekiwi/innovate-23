@@ -1,11 +1,12 @@
 import React, {useEffect, useState} from "react";
 import {TeamEntity} from "../../../models/teamEntity";
-import AttendeeService from "../../../services/attendeeService";
 import TeamListItem from "../teamListItem/teamListItem";
 import AddTeamDialog from "../addTeamDialog/addTeamDialog";
 import {Button} from "reactstrap";
-import Connector from "../../../services/signalr-connection";
+import {useStores} from "../../../stores/rootStore";
+import {observer} from "mobx-react";
 import "./teamsGrid.css"
+import LoadingSpinner from "../../shared/loadingSpinner/loadingSpinner";
 
 export interface ITeamsGridProps {
   isEdit?: boolean;
@@ -14,28 +15,23 @@ export interface ITeamsGridProps {
 
 const TeamsGrid: React.FC<ITeamsGridProps> = (props) => {
   const {isEdit, searchText} = props;
-  const {onAttendeeUpdated} = Connector();
 
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [teams, setTeams] = useState<TeamEntity[]>();
-  const [selectedTeam, setSelectedTeam] = useState<TeamEntity>(new TeamEntity());
-
-  async function loadTeams() {
-    const teams = await AttendeeService.getTeams();
-    setTeams(teams);
-    setIsLoading(false);
-  }
+  const {attendeeDomainStore} = useStores();
+  const isLoading = attendeeDomainStore.isLoadingTeams;
+  const teams = attendeeDomainStore.teams;
 
   useEffect(() => {
-    loadTeams();
-    onAttendeeUpdated(() => loadTeams());
-  }, [onAttendeeUpdated]);
+    if (!teams && !attendeeDomainStore.isLoadingTeams)
+      attendeeDomainStore.loadTeams();
+  }, [attendeeDomainStore, teams]);
+
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedTeam, setSelectedTeam] = useState<TeamEntity>(new TeamEntity());
 
   const handleOpenDialog = () => {
     setIsDialogOpen(true);
   }
+
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
     setSelectedTeam(new TeamEntity());
@@ -48,7 +44,7 @@ const TeamsGrid: React.FC<ITeamsGridProps> = (props) => {
 
   return (
     <div className="team-grid">
-      {isLoading && <div>Loading...</div>}
+      {isLoading && <LoadingSpinner/>}
       {teams && teams
         .map((team) => (
           <TeamListItem team={team} isEdit={isEdit} key={team.id} onEditTeam={handleEditTeam} searchText={searchText}/>
@@ -59,12 +55,11 @@ const TeamsGrid: React.FC<ITeamsGridProps> = (props) => {
           <AddTeamDialog
             isOpen={isDialogOpen}
             toggle={handleCloseDialog}
-            selectedTeam={selectedTeam}
-            onTeamAdded={loadTeams}/>
+            selectedTeam={selectedTeam}/>
         </>
       )}
     </div>
   );
 }
 
-export default TeamsGrid;
+export default observer(TeamsGrid);
