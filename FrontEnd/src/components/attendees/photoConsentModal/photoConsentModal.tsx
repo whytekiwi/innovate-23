@@ -10,13 +10,15 @@ import {
   Modal,
   ModalBody,
   ModalFooter,
-  ModalHeader
+  ModalHeader,
+  Spinner
 } from "reactstrap";
 import QRCode from "qrcode.react";
 import {ConsentState} from "../../../models/consentState";
 import "./photoConsentModal.css";
 import {AttendeeEntity} from "../../../models/attendeeEntity";
 import AttendeeService from "../../../services/attendeeService";
+import {observer} from "mobx-react";
 
 export interface IPhotoConsentModalProps {
   attendee: AttendeeEntity;
@@ -29,14 +31,18 @@ const PhotoConsentModal: React.FC<IPhotoConsentModalProps> = (props) => {
 
   const [hasConsent, setHasConsent] = useState<ConsentState | null>();
 
+  const [isSigningIn, setIsSigningIn] = useState(false);
+
   const handleConsentState = (hasConsent: ConsentState) => {
     setHasConsent(hasConsent);
   }
 
   const handleConsentSubmit = async () => {
+    setIsSigningIn(true);
     if (hasConsent)
       await AttendeeService.selectAttendee(attendee, hasConsent);
     toggle();
+    setIsSigningIn(false);
   }
 
   return (
@@ -95,11 +101,13 @@ const PhotoConsentModal: React.FC<IPhotoConsentModalProps> = (props) => {
         </Fade>
       </ModalBody>
       <ModalFooter>
-        <Button onClick={handleConsentSubmit} disabled={hasConsent === undefined}
-                color="primary">Submit</Button>
+        <Button onClick={handleConsentSubmit} disabled={hasConsent === undefined || isSigningIn}
+                color="primary">
+          {isSigningIn ? <Spinner size="sm"/> : <>Submit</>}
+        </Button>
       </ModalFooter>
     </Modal>
   )
 };
 
-export default PhotoConsentModal;
+export default observer(PhotoConsentModal);

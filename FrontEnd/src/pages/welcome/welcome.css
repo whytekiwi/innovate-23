@@ -1,4 +1,6 @@
 .welcome {
+    cursor: none;
+
     .attendee {
         position: absolute;
         height: 100%;
